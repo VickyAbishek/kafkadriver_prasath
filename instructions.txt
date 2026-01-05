@@ -1,0 +1,13 @@
+go to kafkadriver folder n docker compose yml file
+and run docker compose up -d
+
+run docker ps and after evyerything is up and running
+
+run project with
+./mvnw.cmd spring-boot:run
+
+after both are done,
+go TESTING-GUIDE.md
+copy paste test instructions curl for each test into postman
+and you should get the expected output mentioned there.
+
