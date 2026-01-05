@@ -1,0 +1,36 @@
+Create a  sample spring boot program with below points
+
+ Kafka Producer → Consumer Flow
+ Client
+Sends HTTP request
+Uses Postman / Frontend / Curl
+ REST API (Producer)
+Exposes endpoint (e.g. POST /produce)
+Validates request data
+Converts data to message
+Publishes message to Kafka topic
+ Kafka Topic
+Acts as message queue
+Stores messages temporarily
+Decouples producer and consumer
+Supports high throughput
+ Consumer
+Subscribes to Kafka topic
+Reads messages asynchronously
+Processes message
+Handles failures / retries
+ Log / Database
+Logs processed message
+Saves data to DB
+
+
+
+ End-to-End Flow
+Client → sends request
+Producer → sends event
+Kafka → stores event
+Consumer → processes event
+DB/Log → persists result
+
+
+

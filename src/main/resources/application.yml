@@ -1,0 +1,61 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: kafkadriver
+
+  kafka:
+    bootstrap-servers: localhost:9093
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      properties:
+        spring.json.add.type.headers: false
+
+    consumer:
+      group-id: kafkadriver-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      max-poll-records: 100
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: com.example.kafkadriver.model.MessageEvent
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/kafkadb
+    driver-class-name: org.postgresql.Driver
+    username: kafkauser
+    password: kafkapass123
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 20000
+      idle-timeout: 300000
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+kafka:
+  topic:
+    name: message-events
+    partitions: 3
+    replication-factor: 1
+
+logging:
+  level:
+    root: INFO
+    com.example.kafkadriver: DEBUG
+    org.springframework.kafka: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

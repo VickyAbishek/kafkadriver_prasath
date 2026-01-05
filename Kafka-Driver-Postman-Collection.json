@@ -1,0 +1,323 @@
+{
+  "info": {
+    "_postman_id": "kafka-driver-collection",
+    "name": "Kafka Driver API",
+    "description": "Complete collection for testing Kafka Producer-Consumer application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is UP\", function () {",
+              "    pm.expect(pm.response.json().status).to.eql(\"UP\");",
+              "});",
+              "pm.test(\"Response time is less than 200ms\", function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/messages/health",
+          "host": ["{{base_url}}"],
+          "path": ["api", "messages", "health"]
+        }
+      }
+    },
+    {
+      "name": "Send Single Message",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Response status is 202 Accepted\", function () {",
+              "    pm.response.to.have.status(202);",
+              "});",
+              "pm.test(\"Response contains messageId\", function () {",
+              "    pm.expect(pm.response.json()).to.have.property('messageId');",
+              "});",
+              "pm.test(\"Status is SUCCESS\", function () {",
+              "    pm.expect(pm.response.json().status).to.eql(\"SUCCESS\");",
+              "});",
+              "var jsonData = pm.response.json();",
+              "pm.environment.set(\"last_message_id\", jsonData.messageId);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"messageId\": \"msg-{{$timestamp}}\",\n    \"content\": \"Hello from Postman!\",\n    \"sender\": \"TestUser\",\n    \"metadata\": \"postman-test\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/messages/produce",
+          "host": ["{{base_url}}"],
+          "path": ["api", "messages", "produce"]
+        }
+      }
+    },
+    {
+      "name": "Send Batch Messages (5)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Response status is 202 Accepted\", function () {",
+              "    pm.response.to.have.status(202);",
+              "});",
+              "pm.test(\"Status is SUCCESS\", function () {",
+              "    pm.expect(pm.response.json().status).to.eql(\"SUCCESS\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/messages/test-batch?count=5",
+          "host": ["{{base_url}}"],
+          "path": ["api", "messages", "test-batch"],
+          "query": [
+            {
+              "key": "count",
+              "value": "5"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Send Batch Messages (10)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/messages/test-batch?count=10",
+          "host": ["{{base_url}}"],
+          "path": ["api", "messages", "test-batch"],
+          "query": [
+            {
+              "key": "count",
+              "value": "10"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get All Processed Messages",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Response status is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Response contains total count\", function () {",
+              "    pm.expect(pm.response.json()).to.have.property('total');",
+              "});",
+              "pm.test(\"Response contains messages array\", function () {",
+              "    pm.expect(pm.response.json()).to.have.property('messages');",
+              "    pm.expect(pm.response.json().messages).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/messages/processed",
+          "host": ["{{base_url}}"],
+          "path": ["api", "messages", "processed"]
+        }
+      }
+    },
+    {
+      "name": "Get Messages by Status - SUCCESS",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/messages/processed/status/SUCCESS",
+          "host": ["{{base_url}}"],
+          "path": ["api", "messages", "processed", "status", "SUCCESS"]
+        }
+      }
+    },
+    {
+      "name": "Get Messages by Status - FAILED",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/messages/processed/status/FAILED",
+          "host": ["{{base_url}}"],
+          "path": ["api", "messages", "processed", "status", "FAILED"]
+        }
+      }
+    },
+    {
+      "name": "Get Messages by Status - RETRY",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/messages/processed/status/RETRY",
+          "host": ["{{base_url}}"],
+          "path": ["api", "messages", "processed", "status", "RETRY"]
+        }
+      }
+    },
+    {
+      "name": "Get Messages by Sender",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/messages/processed/sender/TestUser",
+          "host": ["{{base_url}}"],
+          "path": ["api", "messages", "processed", "sender", "TestUser"]
+        }
+      }
+    },
+    {
+      "name": "Send Message - Valid",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 202\", function () {",
+              "    pm.response.to.have.status(202);",
+              "});",
+              "pm.test(\"Message contains success status\", function () {",
+              "    pm.expect(pm.response.json().status).to.eql(\"SUCCESS\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"content\": \"Valid message content\",\n    \"sender\": \"Alice\",\n    \"metadata\": \"important\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/messages/produce",
+          "host": ["{{base_url}}"],
+          "path": ["api", "messages", "produce"]
+        }
+      }
+    },
+    {
+      "name": "Send Message - Missing Content (Invalid)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"messageId\": \"msg-invalid\",\n    \"sender\": \"Bob\",\n    \"metadata\": \"test\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/messages/produce",
+          "host": ["{{base_url}}"],
+          "path": ["api", "messages", "produce"]
+        }
+      }
+    },
+    {
+      "name": "Send Message - Missing Sender (Invalid)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"messageId\": \"msg-invalid-2\",\n    \"content\": \"Content without sender\",\n    \"metadata\": \"test\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/messages/produce",
+          "host": ["{{base_url}}"],
+          "path": ["api", "messages", "produce"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "last_message_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
+
